@@ -11,7 +11,9 @@ function Homepage() {
           <Link to="./updatePricing">
             <button>Update Pricing</button>
           </Link>
+          <Link to="./quote">
           <button>Start a quote</button>
+          </Link>
         </div>
       </>
     );
