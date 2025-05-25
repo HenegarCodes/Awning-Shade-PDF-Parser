@@ -1,32 +1,41 @@
 import express from 'express'
-//import mongoose from 'mongoose'
+import mongoose from 'mongoose'
 import cors from 'cors'
 import dotenv from "dotenv"
-import Router from '.routes/price.js'
+import Router from './routes/price.js'
+
 dotenv.config()
 
 const app = express()
-app.use(cors());
-app.use('/', Router)
-const PORT =  process.env.PORT
 
+// CORS middleware should be applied BEFORE routes
+app.use(cors({
+  origin: 'http://localhost:5173',  // React dev server origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}))
 
-//GET request to the homepage
+// If you expect JSON or urlencoded data, add these:
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB error:', err));
+
+// Use your routes under /api (for example)
+app.use('/api', Router)
+
+// A simple root route
 app.get('/', (req, res) => {
-    res.send("API Running")
+  res.send("API Running")
 })
 
-// GET pricing page route
-Router.get('/price',  (req, res)=>{
-    res.send("Pricing page")
-});
-
-//UPDATE PUT new or overwerite existing PDF
-Router.put("/uploadpdf",  (req, res) => {
-    //update prciing info for current company that matches or is selected.
-    res.send("Upload new PDF page")
-});
-
+// Start server
+const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
-    console.log(`listening on port ${PORT}`)
+  console.log(`listening on port ${PORT}`)
 })
